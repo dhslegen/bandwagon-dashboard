@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.nuxt
+.output
+dist
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log*
+logs
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Temp
+tmp
+temp
+.cache

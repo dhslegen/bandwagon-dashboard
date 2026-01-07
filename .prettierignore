@@ -1,0 +1,38 @@
+# Prettier 忽略文件
+
+# 依赖
+node_modules
+.yarn
+
+# Nuxt 生成
+.nuxt
+.output
+.data
+
+# 构建产物
+dist
+.nitro
+
+# 环境变量
+.env
+.env.*
+
+# 日志
+*.log
+
+# 系统文件
+.DS_Store
+
+# IDE
+.idea
+.vscode/*.json
+!.vscode/settings.json
+
+# 锁文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 其他
+coverage
+public

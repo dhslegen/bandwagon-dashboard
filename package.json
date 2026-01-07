@@ -1,0 +1,40 @@
+{
+  "name": "bandwagon-host-dashboard",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "nuxt typecheck",
+    "format": "prettier --write \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\""
+  },
+  "dependencies": {
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/nuxt": "^14.1.0",
+    "chart.js": "^4.5.1",
+    "dayjs": "^1.11.19",
+    "nuxt": "^4.2.2",
+    "nuxt-auth-utils": "^0.5.26",
+    "vue": "^3.5.26",
+    "vue-chartjs": "^5.3.3",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.12.1",
+    "@nuxt/icon": "^2.2.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@types/node": "^25.0.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.2.2"
+  }
+}
