@@ -272,7 +272,7 @@ onMounted(async () => {
 // 自动刷新（10秒）
 const { pause } = useIntervalFn(() => {
   refreshAll()
-}, 10000)
+}, 3000)
 
 // VPS 状态
 const vpsStatus = computed(() => {

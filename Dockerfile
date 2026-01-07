@@ -14,6 +14,9 @@ RUN yarn install --frozen-lockfile
 # 复制项目文件
 COPY . .
 
+# 生成类型定义
+RUN npx nuxt prepare
+
 # 构建应用
 RUN yarn build
 
