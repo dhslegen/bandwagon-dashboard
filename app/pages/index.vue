@@ -199,7 +199,7 @@ const {
   pending: livePending,
   error: liveError,
   refresh: refreshLive,
-} = useFetch<LiveServiceInfo>('/api/vps/live', {
+} = useApi<LiveServiceInfo>('/api/vps/live', {
   lazy: true,
   server: false,
   immediate: false,
@@ -219,7 +219,7 @@ const {
   pending: usagePending,
   error: usageError,
   refresh: refreshUsage,
-} = useFetch<RawUsageStatsResponse>('/api/vps/stats', {
+} = useApi<RawUsageStatsResponse>('/api/vps/stats', {
   lazy: true,
   server: false,
   immediate: false,
