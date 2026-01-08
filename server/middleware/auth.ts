@@ -25,7 +25,8 @@ export default defineEventHandler(async (event) => {
   if (!session || !session.user) {
     throw createError({
       statusCode: 401,
-      statusMessage: '未授权，请先登录',
+      statusMessage: 'Unauthorized',
+      message: '未授权，请先登录',
     })
   }
 

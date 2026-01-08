@@ -17,11 +17,13 @@ export default defineEventHandler(async (event) => {
         ? (error as { statusCode?: number }).statusCode || 500
         : 500
 
-    const statusMessage =
+    const message =
       typeof error === 'object' && error !== null && 'statusMessage' in error
         ? (error as { statusMessage?: string }).statusMessage || '获取 VPS 实时状态失败'
-        : '获取 VPS 实时状态失败'
+        : typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message?: string }).message
+          : '获取 VPS 实时状态失败'
 
-    throw createError({ statusCode, statusMessage })
+    throw createError({ statusCode, message })
   }
 })

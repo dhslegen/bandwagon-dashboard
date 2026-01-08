@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
   // 登录失败
   throw createError({
     statusCode: 401,
-    statusMessage: '用户名或密码错误',
+    statusMessage: 'Unauthorized',
+    message: '用户名或密码错误',
   })
 })

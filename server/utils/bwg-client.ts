@@ -62,14 +62,16 @@ async function apiRequest<T>(endpoint: string, params: ApiParams = {}): Promise<
         ? (error as { statusCode?: number }).statusCode || 500
         : 500
 
-    const statusMessage =
+    const message =
       typeof error === 'object' && error !== null && 'statusMessage' in error
         ? (error as { statusMessage?: string }).statusMessage || '搬瓦工 API 请求失败'
-        : '搬瓦工 API 请求失败'
+        : typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message?: string }).message
+          : '搬瓦工 API 请求失败'
 
     throw createError({
       statusCode,
-      statusMessage,
+      message,
     })
   }
 }
