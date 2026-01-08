@@ -140,6 +140,11 @@
         </div>
       </div>
 
+      <!-- 流量明细图表 -->
+      <div v-if="usageStats?.data" class="lg:col-span-2 animate-slide-up" style="animation-delay: 400ms">
+        <NetworkChart :data="usageStats.data" />
+      </div>
+
       <!-- 资源使用卡片 -->
       <div
         class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
@@ -205,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ServiceInfo, LiveServiceInfo } from '~/types/bwg'
+import type { LiveServiceInfo, RawUsageStatsResponse } from '~/types/bwg'
 
 definePageMeta({
   middleware: 'auth',
@@ -214,25 +219,7 @@ definePageMeta({
 const isControlling = ref(false)
 
 // 彻底禁用 SSR，改为纯客户端渲染
-const {
-  data: vpsInfo,
-  pending: vpsPending,
-  error: vpsError,
-  refresh: refreshVps,
-} = useFetch<ServiceInfo>('/api/vps/info', {
-  lazy: true, // 延迟加载，避免 SSR
-  server: false, // 禁用服务端渲染
-  immediate: false, // 手动触发
-  onResponse({ response }) {
-    if (import.meta.dev) {
-      console.log('[VPS Info] API 响应:', response._data)
-    }
-  },
-  onResponseError({ response }) {
-    console.error('[VPS Info] API 错误:', response._data)
-  },
-})
-
+// 实时状态（10秒刷新）
 const {
   data: liveInfo,
   pending: livePending,
@@ -252,27 +239,50 @@ const {
   },
 })
 
+// 流量统计（5分钟刷新）
+const {
+  data: usageStats,
+  pending: usagePending,
+  error: usageError,
+  refresh: refreshUsage,
+} = useFetch<RawUsageStatsResponse>('/api/vps/stats', {
+  lazy: true,
+  server: false,
+  immediate: false,
+  onResponse({ response }) {
+    if (import.meta.dev) {
+      console.log('[Usage Stats] API 响应:', response._data)
+    }
+  },
+  onResponseError({ response }) {
+    console.error('[Usage Stats] API 错误:', response._data)
+  },
+})
+
 // 合并 pending 和 error 状态
-const pending = computed(() => vpsPending.value || livePending.value)
-const error = computed(() => vpsError.value || liveError.value)
+const pending = computed(() => livePending.value || usagePending.value)
+const error = computed(() => liveError.value || usageError.value)
 
 // 当前显示的信息（优先使用 Live Info）
-const currentInfo = computed(() => liveInfo.value || vpsInfo.value)
-
-// 统一刷新函数
-const refreshAll = async () => {
-  await Promise.all([refreshVps(), refreshLive()])
-}
+const currentInfo = computed(() => liveInfo.value)
 
 // 组件挂载后首次加载数据
 onMounted(async () => {
-  await refreshAll()
+  await Promise.all([refreshLive(), refreshUsage()])
 })
 
-// 自动刷新（10秒）
-const { pause } = useIntervalFn(() => {
-  refreshAll()
-}, 3000)
+// 实时状态自动刷新（10秒）
+const { pause: pauseLive } = useIntervalFn(() => {
+  refreshLive()
+}, 10000)
+
+// 流量统计自动刷新（5分钟）
+const { pause: pauseUsage } = useIntervalFn(
+  () => {
+    refreshUsage()
+  },
+  5 * 60 * 1000,
+)
 
 // VPS 状态
 const vpsStatus = computed(() => {
@@ -374,7 +384,7 @@ const handleControl = async (action: 'start' | 'stop' | 'restart') => {
     })
 
     alert(`${actionNames[action]}命令已发送`)
-    await refreshAll()
+    await refreshLive()
   } catch (error: unknown) {
     const errorMessage =
       typeof error === 'object' && error !== null && 'data' in error
@@ -418,16 +428,17 @@ function formatBytes(bytes: number): string {
 
 // 组件卸载时停止自动刷新
 onUnmounted(() => {
-  pause()
+  pauseLive()
+  pauseUsage()
 })
 
 // 开发环境监控数据变化
 if (import.meta.dev) {
   watch(
-    [vpsInfo, liveInfo],
-    ([newVps, newLive]) => {
-      console.log('[数据更新] VPS Info:', newVps)
+    [liveInfo, usageStats],
+    ([newLive, newUsage]) => {
       console.log('[数据更新] Live Info:', newLive)
+      console.log('[数据更新] Usage Stats:', newUsage)
     },
     { immediate: true },
   )

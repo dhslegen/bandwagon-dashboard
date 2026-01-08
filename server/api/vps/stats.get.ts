@@ -3,9 +3,13 @@
  * GET /api/vps/stats
  */
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   try {
     const stats = await getRawUsageStats()
+
+    // 明确设置响应头为 JSON
+    setResponseHeader(event, 'Content-Type', 'application/json')
+
     return stats
   } catch (error: unknown) {
     const statusCode =
