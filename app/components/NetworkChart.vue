@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+    class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
   >
     <div class="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
       <!-- 范围选择按钮 -->
@@ -38,7 +38,7 @@
       <div class="hidden sm:block w-[140px]"></div>
     </div>
 
-    <div class="relative h-[300px] w-full">
+    <div class="relative h-[250px] w-full">
       <Bar v-if="chartData.labels.length > 0" :options="chartOptions" :data="chartData" />
       <div v-else class="flex items-center justify-center h-full text-gray-400">暂无数据</div>
     </div>
@@ -59,7 +59,10 @@ import {
   type TooltipItem,
 } from 'chart.js'
 import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import type { UsageDataPoint } from '~/types/bwg'
+
+dayjs.locale('zh-cn')
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
@@ -72,6 +75,7 @@ const ranges = [
   { label: '最近一天', value: 'day' },
   { label: '最近一周', value: 'week' },
   { label: '最近一月', value: 'month' },
+  { label: '最近一年', value: 'year' },
 ] as const
 
 type RangeType = (typeof ranges)[number]['value']
@@ -99,6 +103,9 @@ const filteredData = computed(() => {
       break
     case 'month':
       startTime = now.subtract(30, 'day')
+      break
+    case 'year':
+      startTime = now.subtract(365, 'day')
       break
   }
 
@@ -131,7 +138,7 @@ const filteredData = computed(() => {
 
 const chartData = computed(() => {
   return {
-    labels: filteredData.value.map((d) => dayjs.unix(d.timestamp).format('MMM DD, h A')),
+    labels: filteredData.value.map((d) => dayjs.unix(d.timestamp).format('M月D日 HH:mm')),
     datasets: [
       {
         label: '入网流量',

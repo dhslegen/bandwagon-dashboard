@@ -1,9 +1,9 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- 页面标题 -->
-    <div class="mb-8 animate-fade-in">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">VPS 概览</h1>
-      <p class="text-gray-600 dark:text-gray-400">实时监控您的服务器状态和资源使用情况</p>
+    <div class="mb-6 animate-fade-in">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">VPS 概览</h1>
+      <p class="text-xs text-gray-600 dark:text-gray-400">实时监控您的服务器状态和资源使用情况</p>
     </div>
 
     <!-- 加载状态 -->
@@ -39,37 +39,29 @@
     <div v-else-if="currentInfo" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- VPS 状态卡片 -->
       <div
-        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
+        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
       >
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">VPS 状态</h2>
           <StatusBadge :status="vpsStatus" />
         </div>
 
-        <div class="space-y-4 mb-6">
-          <div class="flex items-center space-x-3">
-            <Icon name="heroicons:server-20-solid" class="w-5 h-5 text-gray-400" />
-            <div class="flex-1">
-              <p class="text-xs text-gray-500 dark:text-gray-500">主机名</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ currentInfo.hostname }}</p>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <Icon name="heroicons:map-pin-20-solid" class="w-5 h-5 text-gray-400" />
-            <div class="flex-1">
-              <p class="text-xs text-gray-500 dark:text-gray-500">位置</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ currentInfo.node_location }}</p>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-3">
-            <Icon name="heroicons:cpu-chip-20-solid" class="w-5 h-5 text-gray-400" />
-            <div class="flex-1">
-              <p class="text-xs text-gray-500 dark:text-gray-500">套餐</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ currentInfo.plan }}</p>
-            </div>
-          </div>
+        <!-- 资源使用进度条 -->
+        <div class="space-y-5 mb-8">
+          <ProgressBar
+            label="内存"
+            :percentage="memoryPercentage"
+            :used="memoryUsed"
+            :total="currentInfo.plan_ram"
+            show-details
+          />
+          <ProgressBar
+            label="磁盘"
+            :percentage="diskPercentage"
+            :used="liveInfo?.ve_used_disk_space_b || 0"
+            :total="currentInfo.plan_disk"
+            show-details
+          />
         </div>
 
         <!-- 控制按钮 -->
@@ -105,10 +97,10 @@
 
       <!-- 流量监控卡片 -->
       <div
-        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
+        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
         style="animation-delay: 100ms"
       >
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">流量监控</h2>
           <div class="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-500">
             <Icon name="heroicons:clock-20-solid" class="w-4 h-4" />
@@ -138,72 +130,26 @@
             </p>
           </div>
         </div>
+
+        <!-- IP 地址列表 -->
+        <div class="mt-3 border-t border-gray-100 dark:border-gray-800 pt-6">
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="(ip, index) in currentInfo.ip_addresses"
+              :key="index"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+              @click="copyToClipboard(ip)"
+            >
+              <span>{{ ip }}</span>
+              <Icon name="heroicons:clipboard-document-20-solid" class="w-3.5 h-3.5 text-gray-400" />
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- 流量明细图表 -->
       <div v-if="usageStats?.data" class="lg:col-span-2 animate-slide-up" style="animation-delay: 400ms">
         <NetworkChart :data="usageStats.data" />
-      </div>
-
-      <!-- 资源使用卡片 -->
-      <div
-        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
-        style="animation-delay: 200ms"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">资源使用</h2>
-
-        <div class="space-y-5">
-          <ProgressBar
-            label="内存"
-            :percentage="memoryPercentage"
-            :used="memoryUsed"
-            :total="currentInfo.plan_ram"
-            show-details
-          />
-
-          <ProgressBar
-            label="磁盘"
-            :percentage="diskPercentage"
-            :used="liveInfo?.ve_used_disk_space_b || 0"
-            :total="currentInfo.plan_disk"
-            show-details
-          />
-
-          <ProgressBar
-            label="Swap"
-            :percentage="swapPercentage"
-            :used="swapUsed"
-            :total="currentInfo.plan_swap"
-            show-details
-          />
-        </div>
-      </div>
-
-      <!-- IP 地址卡片 -->
-      <div
-        class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
-        style="animation-delay: 300ms"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">IP 地址</h2>
-
-        <div class="space-y-3">
-          <div
-            v-for="(ip, index) in currentInfo.ip_addresses"
-            :key="index"
-            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
-          >
-            <div class="flex items-center space-x-3">
-              <Icon name="heroicons:globe-alt-20-solid" class="w-5 h-5 text-gray-400" />
-              <span class="text-sm font-mono font-medium text-gray-900 dark:text-white">{{ ip }}</span>
-            </div>
-            <button
-              class="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
-              @click="copyToClipboard(ip)"
-            >
-              <Icon name="heroicons:clipboard-document-20-solid" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -346,25 +292,6 @@ const diskPercentage = computed(() => {
   if (total === 0) return 0
   const percentage = (used / total) * 100
   return Math.round(Math.max(0, Math.min(100, percentage)))
-})
-
-// Swap 使用率
-const swapPercentage = computed(() => {
-  if (typeof liveInfo.value?.swap_total_kb !== 'number' || typeof liveInfo.value?.swap_available_kb !== 'number')
-    return 0
-  const total = liveInfo.value.swap_total_kb
-  const available = liveInfo.value.swap_available_kb
-  if (total === 0) return 0
-  const used = total - available
-  const percentage = (used / total) * 100
-  return Math.round(Math.max(0, Math.min(100, percentage)))
-})
-
-const swapUsed = computed(() => {
-  if (typeof liveInfo.value?.swap_total_kb !== 'number' || typeof liveInfo.value?.swap_available_kb !== 'number')
-    return 0
-  const used = liveInfo.value.swap_total_kb - liveInfo.value.swap_available_kb
-  return Math.max(0, used) * 1024
 })
 
 // 控制操作
