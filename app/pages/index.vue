@@ -101,7 +101,6 @@
         <!-- 流量监控卡片 -->
         <div
           class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4 shadow-sm hover:shadow-md transition-shadow duration-200 animate-slide-up"
-          style="animation-delay: 100ms"
         >
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white">流量监控</h2>
@@ -176,7 +175,7 @@
 
       <!-- 数据展示 -->
       <template v-else-if="usageStats?.data">
-        <div class="lg:col-span-2 animate-slide-up" style="animation-delay: 400ms">
+        <div class="lg:col-span-2 animate-slide-up">
           <NetworkChart :data="usageStats.data" />
         </div>
       </template>
