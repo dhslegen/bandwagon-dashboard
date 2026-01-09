@@ -1,21 +1,9 @@
-version: '3.8'
-
 services:
   bandwagon-dashboard:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: dhslegle/bandwagon-dashboard:latest
     container_name: bandwagon-dashboard
+    restart: always
     ports:
       - '3000:3000'
     env_file:
-      - .env
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3000']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - /data/app/bandwagon-dashboard/.env

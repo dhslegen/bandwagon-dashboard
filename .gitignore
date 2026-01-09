@@ -28,7 +28,6 @@ logs
 # 排除敏感 Markdown 文件（仅保留 README.md、QUICKSTART.md、Bandwagon Host REST API.md）
 *.md
 !README.md
-!QUICKSTART.md
 !Bandwagon Host REST API.md
 
 # 排除部署和配置文件
