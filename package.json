@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "nuxt typecheck",
     "format": "prettier --write \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\"",
-    "format:check": "prettier --check \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\""
+    "format:check": "prettier --check \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\"",
+    "check-all": "yarn format:check && yarn typecheck && yarn lint:fix && yarn format"
   },
   "dependencies": {
     "@vueuse/core": "^14.1.0",
