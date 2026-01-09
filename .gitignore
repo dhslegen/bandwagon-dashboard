@@ -21,7 +21,6 @@ logs
 # Local env files
 .env
 .env.*
-!.env.example
 .serena
 .claude
 
@@ -30,3 +29,6 @@ logs
 !README.md
 !QUICKSTART.md
 !Bandwagon Host REST API.md
+
+# 排除部署和配置文件
+deployment_summary.txt
