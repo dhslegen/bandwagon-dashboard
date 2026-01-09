@@ -24,3 +24,9 @@ logs
 !.env.example
 .serena
 .claude
+
+# 排除敏感 Markdown 文件（仅保留 README.md、QUICKSTART.md、Bandwagon Host REST API.md）
+*.md
+!README.md
+!QUICKSTART.md
+!Bandwagon Host REST API.md
