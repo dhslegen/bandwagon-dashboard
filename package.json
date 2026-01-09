@@ -13,7 +13,7 @@
     "typecheck": "nuxt typecheck",
     "format": "prettier --write \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\"",
     "format:check": "prettier --check \"**/*.{js,ts,vue,json,md,yml,yaml,css,scss}\"",
-    "check-all": "yarn format:check && yarn typecheck && yarn lint:fix && yarn format",
+    "check-all": "yarn format && yarn typecheck && yarn lint:fix",
     "build-docker": "docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_USERNAME/bandwagon-dashboard:latest --push ."
   },
   "dependencies": {

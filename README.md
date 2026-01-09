@@ -197,7 +197,7 @@ yarn format:check      # 检查代码格式
 yarn check-all         # 完整检查流程（格式 → 类型 → Lint → 格式化）
 
 # Docker 构建（多架构）
-yarn build-docker      # 需要设置 $DOCKER_USERNAME 环境变量
+DOCKER_USERNAME=xxx yarn build-docker     # 需要设置 $DOCKER_USERNAME 环境变量
 ```
 
 ## 🎯 核心功能
