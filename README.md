@@ -23,14 +23,22 @@
 - 🌓 **深色模式** - 自适应深色/浅色主题
 - 🐳 **Docker 部署** - 一键部署，开箱即用
 
-<!--
 ## 📸 截图预览
 
-如果您有项目截图，可以在这里展示：
+<div align="center">
 
-![主看板](screenshots/dashboard.png)
-![流量监控](screenshots/traffic.png)
--->
+### 💻 桌面端
+
+<img width="90%" alt="桌面端主看板界面" src="https://github.com/user-attachments/assets/2156432d-e7ee-463c-86b7-6b489a382cc2" />
+
+<br/>
+<br/>
+
+### 📱 移动端
+
+<img width="300" alt="移动端响应式界面" src="https://github.com/user-attachments/assets/a8a805d1-6157-4b22-ae70-3bb428b4d02a" />
+
+</div>
 
 ## 🚀 快速开始
 
@@ -74,6 +82,7 @@ NUXT_SESSION_PASSWORD=your_random_session_secret_at_least_32_chars
 > **获取 API 密钥**: 登录 [KiwiVM 控制面板](https://kiwivm.64clouds.com)，在侧边栏找到 **"VEID"** 和 **"API Key"**
 >
 > **生成 Session 密钥**:
+>
 > ```bash
 > openssl rand -base64 32
 > ```
