@@ -3,7 +3,19 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@vueuse/nuxt', 'nuxt-auth-utils', '@nuxt/eslint'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/color-mode',
+    '@nuxt/icon',
+    '@vueuse/nuxt',
+    'nuxt-auth-utils',
+    '@nuxt/eslint',
+  ],
+
+  // Color Mode 配置
+  colorMode: {
+    classSuffix: '', // 配合 TailwindCSS 的 darkMode: 'class'
+  },
 
   // TypeScript 配置
   typescript: {

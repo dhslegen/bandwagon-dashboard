@@ -18,6 +18,9 @@
 
           <!-- 用户信息 + 登出 -->
           <div class="flex items-center space-x-4">
+            <!-- Theme Toggle -->
+            <ThemeToggle />
+
             <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Icon name="heroicons:user-circle-20-solid" class="w-5 h-5" />
               <span>{{ user?.username || 'Admin' }}</span>
