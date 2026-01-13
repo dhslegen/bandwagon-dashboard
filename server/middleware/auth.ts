@@ -5,7 +5,7 @@
 
 export default defineEventHandler(async (event) => {
   // 允许的公开路径
-  const publicPaths = ['/api/auth/login', '/api/auth/logout', '/api/auth/session']
+  const publicPaths = ['/api/auth/login', '/api/auth/logout', '/api/auth/session', '/api/_auth/session']
 
   // 检查是否是 API 请求
   const path = getRequestURL(event).pathname

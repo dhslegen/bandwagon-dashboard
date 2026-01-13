@@ -23,7 +23,7 @@
 
             <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Icon name="heroicons:user-circle-20-solid" class="w-5 h-5" />
-              <span>{{ user?.username || 'Admin' }}</span>
+              <span>{{ (user as any)?.username || 'Admin' }}</span>
             </div>
 
             <button
@@ -46,12 +46,14 @@
 </template>
 
 <script setup lang="ts">
-const user = ref({ username: 'admin' })
+const { user, clear } = useUserSession()
 
 const handleLogout = async () => {
   try {
-    await $fetch('/api/auth/logout', { method: 'POST' })
-    await navigateTo('/login')
+    // 使用框架原生的 clear() 方法
+    // 1. 发送 DELETE /api/_auth/session 请求清除服务端 Session
+    // 2. 自动重置前端 user 和 loggedIn 状态
+    await clear()
   } catch (error) {
     console.error('登出失败:', error)
   }

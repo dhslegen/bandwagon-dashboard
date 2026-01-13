@@ -1,0 +1,16 @@
+{
+  "name": "搬瓦工 VPS 看板",
+  "short_name": "VPS看板",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "现代化的搬瓦工 VPS 管理看板",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

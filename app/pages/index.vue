@@ -174,17 +174,30 @@
         </div>
       </template>
     </div>
+
+    <!-- 登录弹窗 -->
+    <LoginModal v-model="showLoginModal" @success="handleLoginSuccess" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { LiveServiceInfo, RawUsageStatsResponse } from '~/types/bwg'
 
-definePageMeta({
-  middleware: 'auth',
+const isControlling = ref(false)
+const showLoginModal = ref(false)
+const { loggedIn, clear: clearSession } = useUserSession()
+
+// 检查登录状态
+onMounted(() => {
+  if (!loggedIn.value) {
+    showLoginModal.value = true
+  }
 })
 
-const isControlling = ref(false)
+// 监听登录成功
+const handleLoginSuccess = async () => {
+  await Promise.all([refreshLive(), refreshUsage()])
+}
 
 // 彻底禁用 SSR，改为纯客户端渲染
 // 实时状态（10秒刷新）
@@ -196,14 +209,22 @@ const {
 } = useApi<LiveServiceInfo>('/api/vps/live', {
   lazy: true,
   server: false,
-  immediate: false,
+  immediate: false, // 只有登录后才请求
   onResponse({ response }) {
     if (import.meta.dev) {
       console.log('[Live Info] API 响应:', response._data)
     }
   },
-  onResponseError({ response }) {
+  async onResponseError({ response }) {
     console.error('[Live Info] API 错误:', response._data)
+    if (response.status === 401) {
+      try {
+        await clearSession()
+      } catch {
+        // 忽略清理 Session 时的错误（例如 401）
+      }
+      showLoginModal.value = true
+    }
   },
 })
 
@@ -216,14 +237,22 @@ const {
 } = useApi<RawUsageStatsResponse>('/api/vps/stats', {
   lazy: true,
   server: false,
-  immediate: false,
+  immediate: false, // 只有登录后才请求
   onResponse({ response }) {
     if (import.meta.dev) {
       console.log('[Usage Stats] API 响应:', response._data)
     }
   },
-  onResponseError({ response }) {
+  async onResponseError({ response }) {
     console.error('[Usage Stats] API 错误:', response._data)
+    if (response.status === 401) {
+      try {
+        await clearSession()
+      } catch {
+        // 忽略清理 Session 时的错误（例如 401）
+      }
+      showLoginModal.value = true
+    }
   },
 })
 
@@ -232,21 +261,42 @@ const currentInfo = computed(() => liveInfo.value)
 
 // 组件挂载后首次加载数据
 onMounted(async () => {
-  await Promise.all([refreshLive(), refreshUsage()])
+  if (loggedIn.value) {
+    await Promise.all([refreshLive(), refreshUsage()])
+  }
 })
 
 // 实时状态自动刷新（10秒）
-const { pause: pauseLive } = useIntervalFn(() => {
-  refreshLive()
+const { pause: pauseLive, resume: resumeLive } = useIntervalFn(() => {
+  if (loggedIn.value && !document.hidden) {
+    refreshLive()
+  }
 }, 10000)
 
 // 流量统计自动刷新（5分钟）
-const { pause: pauseUsage } = useIntervalFn(
+const { pause: pauseUsage, resume: resumeUsage } = useIntervalFn(
   () => {
-    refreshUsage()
+    if (loggedIn.value && !document.hidden) {
+      refreshUsage()
+    }
   },
   5 * 60 * 1000,
 )
+
+// 当登录状态改变时控制自动刷新
+watch(loggedIn, (newValue) => {
+  if (newValue) {
+    refreshLive()
+    refreshUsage()
+    resumeLive()
+    resumeUsage()
+  } else {
+    pauseLive()
+    pauseUsage()
+    // 登出后立即显示登录框
+    showLoginModal.value = true
+  }
+})
 
 // VPS 状态
 const vpsStatus = computed(() => {
@@ -331,6 +381,21 @@ const handleControl = async (action: 'start' | 'stop' | 'restart') => {
     alert(`${actionNames[action]}命令已发送`)
     await refreshLive()
   } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'statusCode' in error &&
+      (error as { statusCode: number }).statusCode === 401
+    ) {
+      try {
+        await clearSession()
+      } catch {
+        // 忽略清理 Session 时的错误
+      }
+      showLoginModal.value = true
+      return
+    }
+
     const errorMessage =
       typeof error === 'object' && error !== null && 'data' in error
         ? (error as { data?: { statusMessage?: string } }).data?.statusMessage || '未知错误'
@@ -373,7 +438,7 @@ function formatBytes(bytes: number): string {
 
 // 组件卸载时停止自动刷新
 onUnmounted(() => {
-  pauseLive()
+  pauseLive() // Ensure these are defined in your script scope as refined above
   pauseUsage()
 })
 
