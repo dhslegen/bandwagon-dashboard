@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 公开路径不需要认证
-  if (publicPaths.includes(path)) {
+  if (publicPaths.includes(path) || path.startsWith('/api/_nuxt_icon')) {
     return
   }
 
